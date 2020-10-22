@@ -10,8 +10,8 @@ var machines = new Map();
 
 async function discoverResult() {
     console.log("Number of machines on network: " + machines.size);
-    // if (machines.size > 0)
-    //console.log(machines);
+    if (machines.size > 0)
+        console.log(machines);
 }
 
 async function broadcastNew() {
@@ -55,7 +55,7 @@ async function discoverController() {
             broadcastNew();
             setTimeout(discoverResult, 5000);
             (async () => {
-                const result = await getResult(machines);
+                const result = await getMachines(machines);
                 resolve(result);
             })();
         });
@@ -72,11 +72,17 @@ function storageStoreControllerClient(req, res) {
 
 }
 
-function getResult(x) {
+function getMachines(x) {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve(x);
         }, 5000);
+    });
+}
+
+function getResult(x) {
+    return new Promise(resolve => {
+        resolve(x);
     });
 }
 
@@ -90,14 +96,13 @@ function executeStoreControllerClient(req, res) {
 
 async function executeAccessControllerClient(req) {
     return new Promise(function (resolve) {
-        //console.log(machines);
         const route = 'api/execute/access';
 
         var result;
         for (var [key, value] of machines) {
             if (value == 'idle') {
                 machines.set(key, 'working');
-                //console.log(machines);
+                console.log(machines);
                 (async () => {
                     result = await requestHandle(req, key, route);
                     machines.set(key, 'idle');
@@ -116,13 +121,12 @@ async function getResultController(ticket) {
         var result;
         for (var [key, value] of machines) {
             if (value == 'idle') {
-                machines.set(key, 'working')
-                    //console.log(machines);
-                    (async () => {
-                        result = await requestHandle(ticket, ticket.address, route);
-                        machines.set(key, 'idle');
-                        resolve(result);
-                    })();
+                machines.set(key, 'working');
+                (async () => {
+                    result = await requestHandle(ticket, ticket.address, route);
+                    machines.set(key, 'idle');
+                    resolve(result);
+                })();
             }
         }
     });
@@ -130,7 +134,6 @@ async function getResultController(ticket) {
 
 function requestHandle(req, address, route) {
     return new Promise(function (resolve) {
-        //console.log(req);
 
         let result;
         request.post(`http://${address}:4445/${route}`, {
@@ -142,6 +145,7 @@ function requestHandle(req, address, route) {
             }
             (async () => {
                 result = await getResult(body);
+
                 resolve(result);
             })();
         });
