@@ -68,8 +68,22 @@ function endServer() {
     server.close();
 }
 
-function storageStoreControllerClient(req, res) {
+async function storageStoreControllerClient(req) {
+    return new Promise(function (resolve) {
+        const route = 'api/storage/store';
 
+        for(var [key, value] of machines) {
+            if (value == 'idle') {
+                machines.set(key, 'working');
+                (async () => {
+                    const result = await requestHandle(req, key, route);
+                    machines.set(key, 'idle');
+                    resolve(result);
+                })();
+                break;
+            }
+        }
+    });
 }
 
 function getMachines(x) {
@@ -86,11 +100,11 @@ function getResult(x) {
     });
 }
 
-function storageAccessControllerClient(req, res) {
-
+async function storageAccessControllerClient(req) {
+    
 }
 
-function executeStoreControllerClient(req, res) {
+function executeStoreControllerClient(req) {
 
 }
 
@@ -98,13 +112,11 @@ async function executeAccessControllerClient(req) {
     return new Promise(function (resolve) {
         const route = 'api/execute/access';
 
-        var result;
         for (var [key, value] of machines) {
             if (value == 'idle') {
                 machines.set(key, 'working');
-                console.log(machines);
                 (async () => {
-                    result = await requestHandle(req, key, route);
+                    const result = await requestHandle(req, key, route);
                     machines.set(key, 'idle');
                     resolve(result);
                 })();
@@ -118,12 +130,11 @@ async function getResultController(ticket) {
     return new Promise(function (resolve) {
         const route = 'api/getresult';
 
-        var result;
         for (var [key, value] of machines) {
             if (value == 'idle') {
                 machines.set(key, 'working');
                 (async () => {
-                    result = await requestHandle(ticket, ticket.address, route);
+                    const result = await requestHandle(ticket, ticket.address, route);
                     machines.set(key, 'idle');
                     resolve(result);
                 })();
