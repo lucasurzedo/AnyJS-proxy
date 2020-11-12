@@ -2,8 +2,8 @@
 
 const controllers = require('./controllers');
 
-async function startJSCL() {
-    const machines = await controllers.discoverController();
+async function startAnyJS(port) {
+    const machines = await controllers.discoveryController(port);
     return machines.size;
 }
 
@@ -34,6 +34,17 @@ async function instantiateObject(req, machines) {
     }
 }
 
+async function getObject(req, machines) {
+    if (machines > 0) {
+        const result = await controllers.storageAccessControllerClient(req);
+        return result;
+    }
+    else {
+        console.log('There must be a cluster on the network');
+        return null;
+    }
+}
+
 function endServer() {
     console.log('Closing server...');
     controllers.endServer();
@@ -41,8 +52,9 @@ function endServer() {
 
 module.exports = {
     endServer,
-    startJSCL,
+    startAnyJS,
     executeAccess,
     getResult,
-    instantiateObject
+    instantiateObject,
+    getObject
 }

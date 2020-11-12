@@ -1,9 +1,11 @@
 'use strict';
 
-const { instantiateObject } = require('../src/index.js');
-const jscl = require('../src/index.js');
+const anyjs = require('../src/index.js');
+const path = require('path');
 
-const json = {
+const { Worker, isMainThread, parentPort, workerData} = require('worker_threads');
+
+const jsonFunc = {
     "nickname": "bubbleSort",
     "input": [4, 3, 5, 2, 12, 14, 51, 23, 99, 110, 1, 7, 11, 20],
     "async": "true",
@@ -18,31 +20,79 @@ const object = {
     "year": 2009
 }
 
-async function bubbleSort(input) {
-    let machines = await jscl.startJSCL();
+function tasksThreaded(){
 
-    let tickets = [];
-    for (let index = 0; index < 5000; index++) {
-        tickets[index] = await jscl.executeAccess(input, machines);
-        console.log(tickets[index]);
+    let i = 0;
+    let workerPath;
+    let json;
+
+    if(isMainThread){
+        for (i; i < 2; i++) {
+            if (i % 2 == 0) {
+                workerPath = path.resolve('test/instantiate.js');
+                json = object;
+            }
+            else {
+                workerPath = path.resolve('test/execute.js');
+                json = jsonFunc
+            }
+            const worker = new Worker(workerPath, { workerData : json})
+
+            worker.on('message', (message) =>{
+                console.log(message);
+            });
+
+            worker.on('error', console.error);
+
+            worker.on('exit', code => {
+                if (code !== 0) console.log(new Error(`Worker stopped with error code ${code}`));
+            })
+        }
     }
+};
 
-    for (let index = 0; index < 5000; index++) {
-        console.log(await jscl.getResult(tickets[index]));
-    }
+tasksThreaded();
 
-    jscl.endServer();
-}
+// async function testeBubbleSort(input) {
+//     let machines = await anyjs.startAnyJS();
 
-async function instantiate(object) {
-    let machines = await jscl.startJSCL();
-    const result = await jscl.instantiateObject(object, machines);
+//     let tickets = [];
+//     for (let index = 0; index < 100; index++) {
+//         tickets[index] = await anyjs.executeAccess(input, machines);
+//         console.log(tickets[index]);
+//     }
+    
+//     for (let index = 99; index >= 0; index--) {
+//         console.log(await anyjs.getResult(tickets[index]));
+//     }
 
-    console.log(result);
+//     anyjs.endServer();
+// }
 
-    jscl.endServer();
-}
+// async function instantiateVar(object) {
+//     let machines = await anyjs.startAnyJS();
 
-bubbleSort(json);
+//     let result;
+//     let cont = 0;
+//     while(cont < 10){
+//         let nickname = "example" + cont;
+//         object.nickname = nickname;
+//         result = await anyjs.instantiateObject(object, machines);
+//         console.log(result);
+//         cont++;
+//     }
 
-//instantiate(object);
+//     cont = 0;
+//     while(cont < 10){
+//         const nickname = {
+//             "nickname" : "example" + cont
+//         }
+//         result = await anyjs.getObject(nickname, machines);
+//         console.log(result);
+//         cont++;
+//     }
+
+//     anyjs.endServer();
+// }
+
+
