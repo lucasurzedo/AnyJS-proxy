@@ -1,27 +1,35 @@
-const { workerData, parentPort } = require('worker_threads')
+const { Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 const anyjs = require('../src/index.js');
 
-const json = workerData;
+const execute = workerData => {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker(__filename, { workerData });
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', code => {
+            if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`))
+        });
+    });
+};
 
-async function execute(json) {
-    let machines = await anyjs.startAnyJS(3001);
+if(!isMainThread){
+    (async () => {
+        const json = workerData;
+        let machines = await anyjs.startAnyJS(3001);
 
-    let tickets = [];
-    for (let index = 0; index < 100; index++) {
-        tickets[index] = await anyjs.executeAccess(json, machines);
-        console.log(tickets[index]);
-    }
+        let tickets = [];
+        for (let index = 0; index < 100; index++) {
+            tickets[index] = await anyjs.executeAccess(json, machines);
+            console.log(tickets[index]);
+        }
 
-    for (let index = 99; index >= 0; index--) {
-        console.log(await anyjs.getResult(tickets[index]));
-    }
+        for (let index = 99; index >= 0; index--) {
+            console.log(await anyjs.getResult(tickets[index]));
+        }
 
-    anyjs.endServer();
-    return "Ends Execute";
+        anyjs.endServer();
+        parentPort.postMessage("Ends Execute");
+    })();
 }
 
-(async () => {
-    const result = await execute(json);
-    parentPort.postMessage(result);
-})();
-
+module.exports = execute;

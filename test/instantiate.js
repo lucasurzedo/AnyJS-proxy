@@ -1,36 +1,45 @@
-const { workerData, parentPort } = require('worker_threads')
+const { Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 const anyjs = require('../src/index.js');
 
-const json = workerData;
+const instantiate = workerData => {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker(__filename, { workerData });
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', code => {
+            if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`))
+        });
+    });
+};
 
-async function instantiate(json) {
-    let machines = await anyjs.startAnyJS(3002);
+if(!isMainThread){
+    (async () => {
+        const json = workerData;
+        let machines = await anyjs.startAnyJS(3002);
 
-    let result;
-    let cont = 0;
-    while(cont < 10){
-        let nickname = "example" + cont;
-        json.nickname = nickname;
-        result = await anyjs.instantiateObject(json, machines);
-        console.log(result);
-        cont++;
-    }
-
-    cont = 0;
-    while(cont < 10){
-        const nickname = {
-            "nickname" : "example" + cont
+        let result;
+        let cont = 0;
+        while(cont < 10){
+            let nickname = "example" + cont;
+            json.nickname = nickname;
+            result = await anyjs.instantiateObject(json, machines);
+            console.log(result);
+            cont++;
         }
-        result = await anyjs.getObject(nickname, machines);
-        console.log(result);
-        cont++;
-    }
 
-    anyjs.endServer();
-    return "Ends Instantiate";
+        cont = 0;
+        while(cont < 10){
+            const nickname = {
+                "nickname" : "example" + cont
+            }
+            result = await anyjs.getObject(nickname, machines);
+            console.log(result);
+            cont++;
+        }
+
+        anyjs.endServer();
+        parentPort.postMessage("Ends instantiate");
+    })();
 }
 
-(async () => {
-    const result = await instantiate(json);
-    parentPort.postMessage(result);
-})();
+module.exports = instantiate;
