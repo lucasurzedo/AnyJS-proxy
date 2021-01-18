@@ -1,26 +1,28 @@
 {
-  "name": "jscl-client",
+  "name": "jscl-proxy",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-worker test/index.js"
+    "test": "node --experimental-worker test/index.js",
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "body-parser": "^1.19.0",
     "eslint": "6.8.0",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-security": "1.4.0",
     "eslint-plugin-sonarjs": "0.5.0",
     "eslint-plugin-unicorn": "18.0.1",
+    "express": "^4.17.1",
     "prettier": "2.0.4",
-    "tap": "14.10.7",
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1"
+    "tap": "14.10.7"
   },
   "dependencies": {
+    "bunyan": "^1.8.14",
     "ip": "^1.1.5",
     "request": "^2.88.2"
   }

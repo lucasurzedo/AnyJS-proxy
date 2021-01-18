@@ -1,5 +1,5 @@
 const { Worker, isMainThread, parentPort, workerData} = require('worker_threads');
-const anyjs = require('../src/index.js');
+const request = require('request');
 
 const instantiate = workerData => {
     return new Promise((resolve, reject) => {
@@ -14,32 +14,30 @@ const instantiate = workerData => {
 
 if(!isMainThread){
     (async () => {
-        const json = workerData;
-        let machines = await anyjs.startAnyJS(3002);
+        for (let index = 0; index < 5; index++) {
+            let executionName = "bubble" + index;
+            request.get(`http://192.168.2.10:4446/api/anyJS/execute/task/bubbleSort/execution/${executionName}`, (error, res, body) => {
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+                (async () => {
+                    result = await getResult(body);
 
-        let result;
-        let cont = 0;
-        while(cont < 10){
-            let nickname = "example" + cont;
-            json.nickname = nickname;
-            result = await anyjs.instantiateObject(json, machines);
-            console.log(result);
-            cont++;
+                    console.log(result);
+                })();
+            });
         }
 
-        cont = 0;
-        while(cont < 10){
-            const nickname = {
-                "nickname" : "example" + cont
-            }
-            result = await anyjs.getObject(nickname, machines);
-            console.log(result);
-            cont++;
-        }
-
-        anyjs.endServer();
         parentPort.postMessage("Ends instantiate");
     })();
 }
+
+function getResult(x) {
+    return new Promise(resolve => {
+        resolve(x);
+    });
+}
+
 
 module.exports = instantiate;
