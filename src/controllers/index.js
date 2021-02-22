@@ -8,27 +8,38 @@ function getResult(x) {
     });
 }
 
-async function requestsController (req, res) {
+async function requestsController(req, res) {
     const route = req.baseUrl + "" + req.url;
-    
-    var result = await requestHandle(req, route);
+    var PORT;
+    var service;
 
-    if(typeof result === "string")
+    if (req.params['notification'] != undefined) {
+        PORT = 4447;
+        service = 'anyjs_observer';
+    }
+    else{
+        PORT = 4445;
+        service = 'anyjs_server';
+    }
+
+    var result = await requestHandle(req, route, PORT, service);
+
+    if (typeof result === "string")
         result = JSON.parse(result);
-    
+
     const status = result.status;
     delete result.status;
 
     res.status(status).send(result);
 }
 
-async function requestHandle(req, route) {
+async function requestHandle(req, route, PORT, service) {
     return new Promise(function (resolve) {
 
         let result;
         switch (req.method) {
             case 'POST':
-                request.post(`http://35.247.213.148:4445${route}`, {
+                request.post(`http://${service}:${PORT}${route}`, {
                     json: req.body
                 }, (error, res, body) => {
                     if (error) {
@@ -43,7 +54,7 @@ async function requestHandle(req, route) {
                 });
                 break;
             case 'GET':
-                request.get(`http://35.247.213.148:4445${route}`, (error, res, body) => {
+                request.get(`http://${service}:${PORT}${route}`, (error, res, body) => {
                     if (error) {
                         console.error(error);
                         return;
@@ -56,7 +67,7 @@ async function requestHandle(req, route) {
                 });
                 break;
             case 'DELETE':
-                request.delete(`http://35.247.213.148:4445${route}`, (error, res, body) => {
+                request.delete(`http://${service}:${PORT}${route}`, (error, res, body) => {
                     if (error) {
                         console.error(error);
                         return;
@@ -68,11 +79,11 @@ async function requestHandle(req, route) {
                     })();
                 });
                 break;
-        
+
             default:
                 break;
         }
-        
+
     });
 }
 

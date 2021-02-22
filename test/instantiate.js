@@ -1,7 +1,7 @@
 const { Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 const request = require('request');
 
-const instantiate = workerData => {
+const execute1 = workerData => {
     return new Promise((resolve, reject) => {
         const worker = new Worker(__filename, { workerData });
         worker.on('message', resolve);
@@ -14,22 +14,29 @@ const instantiate = workerData => {
 
 if(!isMainThread){
     (async () => {
-        for (let index = 0; index < 5; index++) {
-            let executionName = "bubble" + index;
-            request.get(`http://192.168.2.10:4446/api/anyJS/execute/task/bubbleSort/execution/${executionName}`, (error, res, body) => {
+        var results = []
+        var json = workerData;
+        
+        for (let index = 200; index < 400; index++) {
+            json.executionName = "fib" + index;
+            json.parameterValue = index;
+            request.post(`http://35.198.29.145/api/anyJS/execute/task/fibonacci/execution`, {
+                json: json
+                }, (error, res, body) => {
                 if (error) {
                     console.error(error);
                     return;
                 }
                 (async () => {
                     result = await getResult(body);
-
                     console.log(result);
+
+                    results.push(result);
                 })();
             });
         }
 
-        parentPort.postMessage("Ends instantiate");
+        parentPort.postMessage("Ends Execute");
     })();
 }
 
@@ -39,5 +46,4 @@ function getResult(x) {
     });
 }
 
-
-module.exports = instantiate;
+module.exports = execute1;

@@ -15,11 +15,12 @@ const execute = workerData => {
 if(!isMainThread){
     (async () => {
         var results = []
-        const json = workerData;
+        var json = workerData;
         
-        for (let index = 0; index < 5; index++) {
-            json.executionName = "bubble" + index
-            request.post(`http://192.168.2.10:4446/api/anyJS/execute/task/bubbleSort/execution`, {
+        for (let index = 0; index < 200; index++) {
+            json.executionName = "fib" + index;
+            json.parameterValue = index;
+            request.post(`http://35.198.29.145/api/anyJS/execute/task/fibonacci/execution`, {
                 json: json
                 }, (error, res, body) => {
                 if (error) {
