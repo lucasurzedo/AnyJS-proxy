@@ -12,6 +12,8 @@ router.get('/execute/task', requestsController);
 router.get('/execute/task/:taskName/execution', requestsController);
 router.get('/execute/task/:taskName', requestsController);
 router.get('/execute/task/:taskName/execution/:executionName', requestsController);
+router.get('/execute/task/:taskName/execution/:executionName/:notification', requestsController);
 router.delete('/execute/task/:taskName', requestsController);
 router.delete('/execute/task/:taskName/execution/:executionName', requestsController);
+
 module.exports = router;
