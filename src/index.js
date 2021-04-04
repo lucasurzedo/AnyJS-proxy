@@ -1,3 +1,5 @@
+'use strict';
+
 const { setupApp } = require('./express-server');
 const log = require('./log');
 

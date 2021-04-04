@@ -35,7 +35,6 @@ async function requestsController(req, res) {
 
 async function requestHandle(req, route, PORT, service) {
     return new Promise(function (resolve) {
-
         let result;
         switch (req.method) {
             case 'POST':

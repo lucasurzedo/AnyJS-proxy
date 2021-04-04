@@ -4,8 +4,15 @@ const express = require('express');
 const router = express.Router();
 const { requestsController } = require('../controllers');
 
-router.post('/instantiate/store', requestsController);
-router.post('/instantiate/access', requestsController);
+// requests for store objects
+router.post('/store/object', requestsController);
+router.patch('/store/object/:objectName', requestsController);
+router.put('/store/object/:objectName', requestsController);
+router.get('/store/object/', requestsController);
+router.get('/store/object/:objectName', requestsController);
+router.delete('/store/object/:objectName', requestsController);
+
+// requests for execute tasks
 router.post('/execute/task', requestsController);
 router.post('/execute/task/:taskName/execution', requestsController);
 router.get('/execute/task', requestsController);
