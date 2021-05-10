@@ -35,47 +35,43 @@ async function requestsController(req, res) {
 
 async function requestHandle(req, route, PORT, service) {
     return new Promise(function (resolve) {
+        service = '192.168.2.10';
+
         let result;
         switch (req.method) {
             case 'POST':
                 request.post(`http://${service}:${PORT}${route}`, {
                     json: req.body
-                }, (error, res, body) => {
+                }, async (error, res, body) => {
                     if (error) {
                         console.error(error);
                         return;
                     }
-                    (async () => {
-                        result = await getResult(body);
+                    result = await getResult(body);
 
-                        resolve(result);
-                    })();
+                    resolve(result);
                 });
                 break;
             case 'GET':
-                request.get(`http://${service}:${PORT}${route}`, (error, res, body) => {
+                request.get(`http://${service}:${PORT}${route}`, async (error, res, body) => {
                     if (error) {
                         console.error(error);
                         return;
                     }
-                    (async () => {
-                        result = await getResult(body);
+                    result = await getResult(body);
 
-                        resolve(result);
-                    })();
+                    resolve(result);
                 });
                 break;
             case 'DELETE':
-                request.delete(`http://${service}:${PORT}${route}`, (error, res, body) => {
+                request.delete(`http://${service}:${PORT}${route}`, async (error, res, body) => {
                     if (error) {
                         console.error(error);
                         return;
                     }
-                    (async () => {
-                        result = await getResult(body);
+                    result = await getResult(body);
 
-                        resolve(result);
-                    })();
+                    resolve(result);
                 });
                 break;
 

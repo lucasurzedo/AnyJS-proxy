@@ -4,6 +4,11 @@ const express = require('express');
 const router = express.Router();
 const { requestsController } = require('../controllers');
 
+// requests for register service
+router.post('/register', requestsController);
+router.get('/register/:codeName', requestsController);
+router.delete('/register/:codeName', requestsController);
+
 // requests for store objects
 router.post('/store/object', requestsController);
 router.patch('/store/object/:objectName', requestsController);

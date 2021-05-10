@@ -7,7 +7,7 @@ const routes = require('./routes');
 exports.setupApp = async function setupApp() {
     app.use(express.json());
 
-    app.use('/api/anyJS', routes);
+    app.use('/api/anyJS/v1', routes);
 
 	return app;
 };
