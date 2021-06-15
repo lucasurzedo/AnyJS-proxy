@@ -17,7 +17,7 @@ async function requestsController(req, res) {
         PORT = 4447;
         service = 'anyjs_observer';
     }
-    else{
+    else {
         PORT = 4445;
         service = 'anyjs_server';
     }

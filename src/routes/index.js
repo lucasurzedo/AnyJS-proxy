@@ -17,6 +17,12 @@ router.get('/store/object/', requestsController);
 router.get('/store/object/:objectName', requestsController);
 router.delete('/store/object/:objectName', requestsController);
 
+// requests for instantiate service
+router.post('/instantiate/', requestsController);
+router.get('/instantiate/', requestsController);
+router.get('/instantiate/:objectName', requestsController);
+router.delete('/instantiate/:objectName', requestsController);
+
 // requests for execute tasks
 router.post('/execute/task', requestsController);
 router.post('/execute/task/:taskName/execution', requestsController);
